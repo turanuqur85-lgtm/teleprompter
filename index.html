@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>Teleprompter Pro</title>
+
+<style>
+body {
+    margin: 0;
+    background: black;
+    color: white;
+    font-size: 60px;
+    overflow: hidden;
+    font-family: Arial;
+}
+
+#text {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    white-space: pre-line;
+    bottom: 0;
+}
+
+.controls {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 10;
+    background: rgba(0,0,0,0.6);
+    padding: 10px;
+}
+
+#countdown {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 120px;
+    display: none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="controls">
+    <textarea id="inputText" rows="4" cols="40" placeholder="Metni buraya yapıştır"></textarea><br>
+    <button onclick="startCountdown()">Başlat</button>
+    <button onclick="pause()">Duraklat</button>
+    <button onclick="mirror()">Mirror</button>
+    <button onclick="forward()">İleri</button>
+    <button onclick="backward()">Geri</button>
+    Hız: <input type="range" id="speed" min="1" max="10" value="3">
+</div>
+
+<div id="countdown">3</div>
+<div id="text"></div>
+
+<script>
+let pos = 0;
+let interval;
+let isPlaying = false;
+
+// GERİ SAYIM
+function startCountdown() {
+    let count = 3;
+    const cd = document.getElementById("countdown");
+    cd.style.display = "block";
+    cd.innerText = count;
+
+    let countdownInterval = setInterval(() => {
+        count--;
+        if (count === 0) {
+            cd.innerText = "0";
+        } else {
+            cd.innerText = count;
+        }
+
+        if (count < 0) {
+            clearInterval(countdownInterval);
+            cd.style.display = "none";
+            start();
+        }
+    }, 1000);
+}
+
+// BAŞLAT
+function start() {
+    const textEl = document.getElementById("text");
+    textEl.innerText = document.getElementById("inputText").value;
+
+    pos = -window.innerHeight;
+    textEl.style.bottom = pos + "px";
+
+    if (isPlaying) return;
+
+    isPlaying = true;
+    interval = setInterval(scrollText, 30);
+}
+
+// DURDUR
+function pause() {
+    isPlaying = false;
+    clearInterval(interval);
+}
+
+// SCROLL
+function scrollText() {
+    let speed = document.getElementById("speed").value;
+    pos += Number(speed);
+    document.getElementById("text").style.bottom = pos + "px";
+}
+
+// İLERİ SAR
+function forward() {
+    pos += 200;
+    document.getElementById("text").style.bottom = pos + "px";
+}
+
+// GERİ SAR
+function backward() {
+    pos -= 200;
+    document.getElementById("text").style.bottom = pos + "px";
+}
+
+// MIRROR
+function mirror() {
+    let el = document.getElementById("text");
+
+    if (el.style.transform === "scaleX(-1)") {
+        el.style.transform = "scaleX(1)";
+    } else {
+        el.style.transform = "scaleX(-1)";
+    }
+}
+
+// KLAVYE / KUMANDA
+document.addEventListener("keydown", function(e) {
+
+    if (e.key === " ") {
+        if (isPlaying) pause();
+        else startCountdown();
+    }
+
+    if (e.key === "ArrowUp") {
+        let s = document.getElementById("speed");
+        s.value = Number(s.value) + 1;
+    }
+
+    if (e.key === "ArrowDown") {
+        let s = document.getElementById("speed");
+        s.value = Number(s.value) - 1;
+    }
+
+    if (e.key === "ArrowRight") {
+        forward();
+    }
+
+    if (e.key === "ArrowLeft") {
+        backward();
+    }
+
+    if (e.key === "m") {
+        mirror();
+    }
+});
+</script>
+
+</body>
+</html>
