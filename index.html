@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="tr">
-
 <head>
 
 <meta charset="UTF-8">
@@ -11,8 +10,10 @@ initial-scale=1.0,
 maximum-scale=1.0,
 user-scalable=no">
 
-<title>Teleprompter Pro</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 
+<title>Teleprompter Pro</title>
 
 <style>
 
@@ -32,28 +33,16 @@ html {
 }
 
 body {
-
     margin: 0;
     padding: 0;
 
     background: #000;
-
-    color: white;
+    color: #fff;
 
     font-family:
         Arial,
         Helvetica,
         sans-serif;
-
-    /*
-       ÇOK ÖNEMLİ
-
-       Artık sayfanın scroll edilmesine
-       izin veriyoruz.
-
-       BLE-M3 yukarı/aşağı hareket ettiğinde
-       Safari'nin doğal scroll sistemi çalışacak.
-    */
 
     overflow-x: hidden;
     overflow-y: auto;
@@ -63,11 +52,10 @@ body {
 
 
 /* =====================================================
-   TELEPROMPTER METİN ALANI
+   PROMPTER
 ===================================================== */
 
 #prompter {
-
     position: relative;
 
     width: 100%;
@@ -75,7 +63,6 @@ body {
     min-height: 100vh;
 
     background: #000;
-
 }
 
 
@@ -85,14 +72,22 @@ body {
 
 #text {
 
+    /*
+       Bu değer slider ile değişecek.
+    */
+
     width: 90%;
 
-    margin-left: 5%;
+    /*
+       Otomatik ortalama.
+    */
+
+    margin-left: auto;
+    margin-right: auto;
 
     text-align: center;
 
     white-space: pre-wrap;
-
     word-wrap: break-word;
 
     font-size: 60px;
@@ -103,25 +98,11 @@ body {
 
     color: #fff;
 
-    /*
-       ÜST BOŞLUK
-
-       Metnin ilk satırının kameranın
-       karşısına gelmesini sağlıyor.
-    */
-
     padding-top: 45vh;
-
-
-    /*
-       ALT BOŞLUK
-
-       Son satırın da ekranda okunabilmesini
-       sağlıyor.
-    */
 
     padding-bottom: 100vh;
 
+    transform-origin: center center;
 }
 
 
@@ -146,12 +127,11 @@ body {
     pointer-events: none;
 
     z-index: 50;
-
 }
 
 
 /* =====================================================
-   ÜST DURUM
+   DURUM BAR
 ===================================================== */
 
 #statusBar {
@@ -159,11 +139,9 @@ body {
     position: fixed;
 
     top: 15px;
-
     left: 50%;
 
-    transform:
-        translateX(-50%);
+    transform: translateX(-50%);
 
     z-index: 1000;
 
@@ -173,13 +151,12 @@ body {
 
     gap: 10px;
 
-    padding:
-        8px 15px;
+    padding: 8px 15px;
 
     border-radius: 20px;
 
     background:
-        rgba(20,20,20,0.8);
+        rgba(20,20,20,0.82);
 
     color: #aaa;
 
@@ -187,23 +164,22 @@ body {
 
     pointer-events: none;
 
+    transition: opacity .25s;
 }
 
 
 /* =====================================================
-   DURUM NOKTASI
+   STATUS NOKTA
 ===================================================== */
 
 .status-dot {
 
     width: 9px;
-
     height: 9px;
 
     border-radius: 50%;
 
     background: #555;
-
 }
 
 .status-dot.ready {
@@ -241,18 +217,20 @@ body {
     background:
         rgba(20,20,20,0.95);
 
-    backdrop-filter:
-        blur(12px);
+    backdrop-filter: blur(12px);
 
     box-shadow:
         0 10px 40px
-        rgba(0,0,0,0.5);
+        rgba(0,0,0,.5);
 
+    transition:
+        opacity .25s,
+        transform .25s;
 }
 
 
 /* =====================================================
-   SATIR
+   SATIRLAR
 ===================================================== */
 
 .control-row {
@@ -266,13 +244,10 @@ body {
     margin-bottom: 12px;
 
     flex-wrap: wrap;
-
 }
 
 .control-row:last-child {
-
     margin-bottom: 0;
-
 }
 
 
@@ -284,12 +259,11 @@ body {
 
     width: 100%;
 
-    min-height: 130px;
+    min-height: 120px;
 
     resize: none;
 
-    border:
-        1px solid #333;
+    border: 1px solid #333;
 
     border-radius: 12px;
 
@@ -304,18 +278,15 @@ body {
     line-height: 1.5;
 
     outline: none;
-
 }
 
 #inputText:focus {
-
     border-color: #777;
-
 }
 
 
 /* =====================================================
-   BUTON
+   BUTONLAR
 ===================================================== */
 
 button {
@@ -324,8 +295,7 @@ button {
 
     border-radius: 10px;
 
-    padding:
-        13px 18px;
+    padding: 13px 18px;
 
     background: #292929;
 
@@ -340,30 +310,28 @@ button {
     user-select: none;
 
     touch-action: manipulation;
-
 }
 
 button:active {
-
-    transform:
-        scale(0.96);
-
+    transform: scale(.96);
 }
-
 
 #startButton {
 
     background: #fff;
 
     color: #000;
-
 }
 
+.activeButton {
+
+    background: #175f39 !important;
+
+    color: white !important;
+}
 
 .navigationButton {
-
     min-width: 90px;
-
 }
 
 
@@ -381,8 +349,7 @@ button:active {
 
     flex: 1;
 
-    min-width: 220px;
-
+    min-width: 260px;
 }
 
 .slider-group label {
@@ -393,12 +360,11 @@ button:active {
 
     white-space: nowrap;
 
+    min-width: 105px;
 }
 
 input[type="range"] {
-
     flex: 1;
-
 }
 
 
@@ -421,7 +387,7 @@ input[type="range"] {
     justify-content: center;
 
     background:
-        rgba(0,0,0,0.85);
+        rgba(0,0,0,.88);
 
     font-size:
         min(25vw,220px);
@@ -429,7 +395,41 @@ input[type="range"] {
     font-weight: bold;
 
     color: white;
+}
 
+
+/* =====================================================
+   SES BİLGİSİ
+===================================================== */
+
+#voiceIndicator {
+
+    position: fixed;
+
+    right: 15px;
+    top: 15px;
+
+    z-index: 1000;
+
+    display: none;
+
+    padding: 8px 12px;
+
+    border-radius: 20px;
+
+    background:
+        rgba(20,20,20,.82);
+
+    font-size: 13px;
+
+    color: #aaa;
+
+    pointer-events: none;
+}
+
+#voiceIndicator.listening {
+    display: block;
+    color: #6de69e;
 }
 
 
@@ -444,20 +444,53 @@ body.presentation-mode #controls {
     pointer-events: none;
 
     transform:
-        translateY(30px);
-
+        translateY(40px);
 }
 
 body.presentation-mode #statusBar {
-
     opacity: 0;
+}
 
+body.presentation-mode #voiceIndicator {
+    opacity: 0;
 }
 
 body.presentation-mode #readingLine {
-
     opacity: 0;
+}
 
+
+/* =====================================================
+   ÇİFT TIK BİLGİSİ
+===================================================== */
+
+#presentationHint {
+
+    position: fixed;
+
+    left: 50%;
+    bottom: 30px;
+
+    transform:
+        translateX(-50%);
+
+    z-index: 8000;
+
+    padding:
+        10px 18px;
+
+    border-radius: 25px;
+
+    background:
+        rgba(30,30,30,.9);
+
+    color: #aaa;
+
+    font-size: 14px;
+
+    display: none;
+
+    pointer-events: none;
 }
 
 
@@ -470,24 +503,16 @@ body.presentation-mode #readingLine {
     #controls {
 
         left: 10px;
-
         right: 10px;
-
         bottom: 10px;
 
         padding: 12px;
-
     }
-
 
     #text {
 
         font-size: 46px;
-
-        line-height: 1.4;
-
     }
-
 
     button {
 
@@ -495,32 +520,32 @@ body.presentation-mode #readingLine {
             12px 14px;
 
         font-size: 15px;
-
     }
-
 
     #inputText {
 
-        min-height: 100px;
-
+        min-height: 95px;
     }
 
+    .slider-group {
+
+        min-width: 100%;
+    }
 }
 
 </style>
 
 </head>
 
-
 <body>
 
 
 <!-- =====================================================
-     GERİ SAYIM
+     COUNTDOWN
 ===================================================== -->
 
 <div id="countdown">
-    3
+3
 </div>
 
 
@@ -543,19 +568,32 @@ body.presentation-mode #readingLine {
 
 
 <!-- =====================================================
-     TELEPROMPTER
+     SES
+===================================================== -->
+
+<div id="voiceIndicator">
+🎙 Dinliyor
+</div>
+
+
+<!-- =====================================================
+     ÇEKİM MODU BİLGİ
+===================================================== -->
+
+<div id="presentationHint">
+Çekim modundan çıkmak için ekrana çift dokun
+</div>
+
+
+<!-- =====================================================
+     PROMPTER
 ===================================================== -->
 
 <div id="prompter">
 
-
     <div id="text">
-
-        Metninizi aşağıdaki kutuya
-        yazın veya yapıştırın.
-
+        Teleprompter metninizi aşağıdaki kutuya yazın.
     </div>
-
 
 </div>
 
@@ -564,8 +602,7 @@ body.presentation-mode #readingLine {
      OKUMA ÇİZGİSİ
 ===================================================== -->
 
-<div id="readingLine">
-</div>
+<div id="readingLine"></div>
 
 
 <!-- =====================================================
@@ -581,8 +618,7 @@ body.presentation-mode #readingLine {
 
         <textarea
             id="inputText"
-            placeholder="Teleprompter metnini buraya yapıştır...">
-        </textarea>
+            placeholder="Teleprompter metnini buraya yapıştır..."></textarea>
 
     </div>
 
@@ -591,73 +627,70 @@ body.presentation-mode #readingLine {
 
     <div class="control-row">
 
-
         <button
             id="startButton"
             onclick="startCountdown()">
-
             ▶ Başlat
-
         </button>
 
 
         <button
             onclick="togglePlayPause()">
-
-            ⏸ Duraklat
-
+            ⏯ Dur / Devam
         </button>
 
 
         <button
             onclick="restartText()">
-
             ↺ Başa Dön
-
         </button>
 
 
         <button
+            id="mirrorButton"
             onclick="toggleMirror()">
-
             ⇄ Mirror
-
         </button>
 
 
         <button
-            onclick="togglePresentationMode()">
-
+            onclick="enterPresentationMode()">
             🎬 Çekim Modu
-
         </button>
 
+
+        <button
+            id="voiceButton"
+            onclick="toggleVoiceControl()">
+            🎙 Sesli Kontrol
+        </button>
 
     </div>
 
 
-    <!-- MANUEL İLERİ GERİ -->
+    <!-- İLERİ / GERİ -->
 
     <div class="control-row">
-
 
         <button
             class="navigationButton"
             onclick="moveBackward()">
-
             ◀ Geri
-
         </button>
 
 
         <button
             class="navigationButton"
             onclick="moveForward()">
-
             İleri ▶
-
         </button>
 
+    </div>
+
+
+    <!-- HIZ -->
+
+    <div class="control-row">
 
         <div class="slider-group">
 
@@ -668,17 +701,16 @@ body.presentation-mode #readingLine {
             <input
                 type="range"
                 id="speed"
-                min="0.5"
+                min="0.25"
                 max="8"
-                step="0.5"
-                value="3">
+                step="0.25"
+                value="2">
 
             <span id="speedValue">
-                3
+                2
             </span>
 
         </div>
-
 
     </div>
 
@@ -687,11 +719,10 @@ body.presentation-mode #readingLine {
 
     <div class="control-row">
 
-
         <div class="slider-group">
 
             <label>
-                Yazı
+                Yazı Boyutu
             </label>
 
             <input
@@ -708,12 +739,37 @@ body.presentation-mode #readingLine {
 
         </div>
 
+    </div>
+
+
+    <!-- METİN GENİŞLİĞİ -->
+
+    <div class="control-row">
+
+        <div class="slider-group">
+
+            <label>
+                Metin Genişliği
+            </label>
+
+            <input
+                type="range"
+                id="textWidth"
+                min="35"
+                max="96"
+                step="1"
+                value="90">
+
+            <span id="textWidthValue">
+                90%
+            </span>
+
+        </div>
 
     </div>
 
 
 </div>
-
 
 
 <script>
@@ -723,35 +779,53 @@ body.presentation-mode #readingLine {
 ===================================================== */
 
 const textElement =
-    document.getElementById("text");
+document.getElementById("text");
 
 const inputText =
-    document.getElementById("inputText");
+document.getElementById("inputText");
 
 const countdownElement =
-    document.getElementById("countdown");
+document.getElementById("countdown");
 
 const speedSlider =
-    document.getElementById("speed");
+document.getElementById("speed");
 
 const speedValue =
-    document.getElementById("speedValue");
+document.getElementById("speedValue");
 
 const fontSizeSlider =
-    document.getElementById("fontSize");
+document.getElementById("fontSize");
 
 const fontSizeValue =
-    document.getElementById("fontSizeValue");
+document.getElementById("fontSizeValue");
+
+const textWidthSlider =
+document.getElementById("textWidth");
+
+const textWidthValue =
+document.getElementById("textWidthValue");
 
 const statusText =
-    document.getElementById("statusText");
+document.getElementById("statusText");
 
 const statusDot =
-    document.getElementById("statusDot");
+document.getElementById("statusDot");
+
+const voiceButton =
+document.getElementById("voiceButton");
+
+const voiceIndicator =
+document.getElementById("voiceIndicator");
+
+const presentationHint =
+document.getElementById("presentationHint");
+
+const controls =
+document.getElementById("controls");
 
 
 /* =====================================================
-   DEĞİŞKENLER
+   DURUM
 ===================================================== */
 
 let isPlaying = false;
@@ -762,12 +836,121 @@ let countdownRunning = false;
 
 let isMirror = false;
 
+let voiceEnabled = false;
+
+let recognition = null;
+
+let lastFrameTime = 0;
+
 
 /*
-   Manuel ileri / geri miktarı
+   Manuel ileri geri miktarı
 */
 
-const jumpAmount = 450;
+const jumpAmount = 400;
+
+
+/* =====================================================
+   AYARLARI YÜKLE
+===================================================== */
+
+function loadSettings() {
+
+    const savedText =
+        localStorage.getItem(
+            "prompterText"
+        );
+
+    const savedSpeed =
+        localStorage.getItem(
+            "prompterSpeed"
+        );
+
+    const savedFont =
+        localStorage.getItem(
+            "prompterFont"
+        );
+
+    const savedWidth =
+        localStorage.getItem(
+            "prompterWidth"
+        );
+
+
+    if (savedText !== null) {
+
+        inputText.value =
+            savedText;
+    }
+
+
+    if (savedSpeed !== null) {
+
+        speedSlider.value =
+            savedSpeed;
+    }
+
+
+    if (savedFont !== null) {
+
+        fontSizeSlider.value =
+            savedFont;
+    }
+
+
+    if (savedWidth !== null) {
+
+        textWidthSlider.value =
+            savedWidth;
+    }
+
+
+    applySettings();
+
+}
+
+
+/* =====================================================
+   AYARLARI UYGULA
+===================================================== */
+
+function applySettings() {
+
+    speedValue.innerText =
+        speedSlider.value;
+
+
+    fontSizeValue.innerText =
+        fontSizeSlider.value;
+
+
+    textWidthValue.innerText =
+        textWidthSlider.value + "%";
+
+
+    textElement.style.fontSize =
+        fontSizeSlider.value + "px";
+
+
+    /*
+       İSTEDİĞİN ÖZELLİK BURASI.
+
+       Font küçülmüyor.
+
+       Sadece metin sütunu
+       daralıyor/genişliyor.
+
+       margin auto olduğu için
+       daima ekranın ortasında.
+    */
+
+    textElement.style.width =
+        textWidthSlider.value + "%";
+
+
+    loadText();
+
+}
 
 
 /* =====================================================
@@ -775,8 +958,8 @@ const jumpAmount = 450;
 ===================================================== */
 
 function setStatus(
-    text,
-    type = "ready"
+text,
+type = "ready"
 ) {
 
     statusText.innerText =
@@ -789,7 +972,7 @@ function setStatus(
 
 
 /* =====================================================
-   METİN YÜKLE
+   METİN
 ===================================================== */
 
 function loadText() {
@@ -797,17 +980,10 @@ function loadText() {
     const content =
         inputText.value.trim();
 
-    if (content.length > 0) {
 
-        textElement.innerText =
-            content;
-
-    } else {
-
-        textElement.innerText =
-            "Metninizi aşağıdaki kutuya yazın veya yapıştırın.";
-
-    }
+    textElement.innerText =
+        content ||
+        "Teleprompter metninizi aşağıdaki kutuya yazın.";
 
 }
 
@@ -820,10 +996,10 @@ function restartText() {
 
     stopScrolling();
 
-    window.scrollTo({
-        top: 0,
-        behavior: "instant"
-    });
+    window.scrollTo(
+        0,
+        0
+    );
 
     setStatus(
         "Başa döndü",
@@ -845,22 +1021,17 @@ function startCountdown() {
 
     loadText();
 
-
-    countdownRunning =
-        true;
-
-
     stopScrolling();
 
 
-    /*
-       Metni sayfanın en üstüne al
-    */
+    window.scrollTo(
+        0,
+        0
+    );
 
-    window.scrollTo({
-        top: 0,
-        behavior: "instant"
-    });
+
+    countdownRunning =
+        true;
 
 
     countdownElement.style.display =
@@ -875,45 +1046,50 @@ function startCountdown() {
 
 
     const timer =
-        setInterval(() => {
+        setInterval(
+            function() {
 
 
-            count--;
+                count--;
 
 
-            if (count >= 0) {
+                if (count >= 0) {
 
-                countdownElement.innerText =
-                    count;
+                    countdownElement.innerText =
+                        count;
 
-            }
-
-
-            if (count < 0) {
-
-                clearInterval(timer);
+                }
 
 
-                countdownElement.style.display =
-                    "none";
+                if (count < 0) {
+
+                    clearInterval(
+                        timer
+                    );
 
 
-                countdownRunning =
-                    false;
+                    countdownElement.style.display =
+                        "none";
 
 
-                startScrolling();
+                    countdownRunning =
+                        false;
 
-            }
+
+                    startScrolling();
+
+                }
 
 
-        }, 1000);
+            },
+            1000
+        );
 
 }
 
 
 /* =====================================================
-   OTOMATİK KAYDIRMA
+   BAŞLAT
 ===================================================== */
 
 function startScrolling() {
@@ -924,6 +1100,10 @@ function startScrolling() {
 
     isPlaying =
         true;
+
+
+    lastFrameTime =
+        performance.now();
 
 
     setStatus(
@@ -941,7 +1121,7 @@ function startScrolling() {
 
 
 /* =====================================================
-   DURDUR
+   DUR
 ===================================================== */
 
 function stopScrolling() {
@@ -958,7 +1138,6 @@ function stopScrolling() {
 
         animationFrame =
             null;
-
     }
 
 
@@ -971,7 +1150,7 @@ function stopScrolling() {
 
 
 /* =====================================================
-   OYNAT / DURAKLAT
+   DUR / DEVAM
 ===================================================== */
 
 function togglePlayPause() {
@@ -994,13 +1173,29 @@ function togglePlayPause() {
 
 
 /* =====================================================
-   OTOMATİK SCROLL
+   SCROLL
 ===================================================== */
 
-function scrollLoop() {
+function scrollLoop(timestamp) {
 
     if (!isPlaying)
         return;
+
+
+    /*
+       Frame rate'den bağımsız hareket.
+
+       iPad 60Hz / 120Hz olsa da
+       hız daha tutarlı kalır.
+    */
+
+    const delta =
+        timestamp -
+        lastFrameTime;
+
+
+    lastFrameTime =
+        timestamp;
 
 
     const speed =
@@ -1009,17 +1204,15 @@ function scrollLoop() {
         );
 
 
-    /*
-       Sayfayı doğal olarak yukarı
-       kaydırıyoruz.
+    const movement =
+        speed *
+        delta /
+        16.67;
 
-       Böylece BLE-M3'ün yukarı/aşağı
-       kontrolü ile aynı sistem kullanılıyor.
-    */
 
     window.scrollBy(
         0,
-        speed
+        movement
     );
 
 
@@ -1038,8 +1231,11 @@ function scrollLoop() {
 function moveForward() {
 
     window.scrollBy({
+
         top: jumpAmount,
+
         behavior: "smooth"
+
     });
 
 }
@@ -1052,8 +1248,11 @@ function moveForward() {
 function moveBackward() {
 
     window.scrollBy({
+
         top: -jumpAmount,
+
         behavior: "smooth"
+
     });
 
 }
@@ -1069,105 +1268,77 @@ function toggleMirror() {
         !isMirror;
 
 
-    if (isMirror) {
+    textElement.style.transform =
+        isMirror
+        ? "scaleX(-1)"
+        : "scaleX(1)";
 
-        textElement.style.transform =
-            "scaleX(-1)";
 
-    } else {
-
-        textElement.style.transform =
-            "scaleX(1)";
-
-    }
+    document
+        .getElementById(
+            "mirrorButton"
+        )
+        .classList
+        .toggle(
+            "activeButton",
+            isMirror
+        );
 
 }
-
-
-/* =====================================================
-   HIZ
-===================================================== */
-
-speedSlider.addEventListener(
-    "input",
-    function() {
-
-        speedValue.innerText =
-            speedSlider.value;
-
-    }
-);
-
-
-/* =====================================================
-   YAZI BOYUTU
-===================================================== */
-
-fontSizeSlider.addEventListener(
-    "input",
-    function() {
-
-        const size =
-            fontSizeSlider.value;
-
-
-        textElement.style.fontSize =
-            size + "px";
-
-
-        fontSizeValue.innerText =
-            size;
-
-    }
-);
-
-
-/* =====================================================
-   METİN DEĞİŞİNCE
-===================================================== */
-
-inputText.addEventListener(
-    "input",
-    function() {
-
-        loadText();
-
-    }
-);
 
 
 /* =====================================================
    ÇEKİM MODU
 ===================================================== */
 
-function togglePresentationMode() {
+function enterPresentationMode() {
 
-    document.body.classList.toggle(
+    document.body.classList.add(
         "presentation-mode"
+    );
+
+
+    presentationHint.style.display =
+        "block";
+
+
+    /*
+       Kullanıcıya çift dokunmayı
+       2 saniye göster.
+    */
+
+    setTimeout(
+        function() {
+
+            presentationHint.style.display =
+                "none";
+
+        },
+        2200
     );
 
 }
 
 
+function exitPresentationMode() {
+
+    document.body.classList.remove(
+        "presentation-mode"
+    );
+
+
+    presentationHint.style.display =
+        "none";
+
+}
+
+
 /* =====================================================
-   EKRANA TIKLAMA
+   ÇİFT DOKUNMA / ÇİFT CLICK
 ===================================================== */
 
-/*
-   BURASI BLE-M3 İÇİN ÖNEMLİ.
+let lastTapTime = 0;
 
-   Kumandanın CLICK olayı Safari tarafından
-   mouse click olarak geliyor.
-
-   Ekranın herhangi bir yerine tıklandığında:
-
-   Oynuyorsa → DUR
-
-   Duruyorsa → DEVAM
-
-   Ancak kontrol paneline tıklanırsa
-   bu işlem yapılmayacak.
-*/
 
 document.addEventListener(
     "click",
@@ -1175,15 +1346,9 @@ document.addEventListener(
 
 
         /*
-           Kontrol paneline tıklanıyorsa
-           teleprompter kontrolünü tetikleme.
+           Kontrol panelindeyse
+           normal buton davranışı.
         */
-
-        const controls =
-            document.getElementById(
-                "controls"
-            );
-
 
         if (
             controls.contains(
@@ -1196,12 +1361,58 @@ document.addEventListener(
         }
 
 
+        const now =
+            Date.now();
+
+
+        const timeDifference =
+            now -
+            lastTapTime;
+
+
         /*
-           Geri sayım sırasında click
-           hiçbir şey yapmasın.
+           ÇEKİM MODUNDAYKEN
+
+           çift click =
+           çekim modundan çık.
         */
 
-        if (countdownRunning) {
+        if (
+            document.body.classList.contains(
+                "presentation-mode"
+            )
+        ) {
+
+
+            if (
+                timeDifference > 0 &&
+                timeDifference < 450
+            ) {
+
+                exitPresentationMode();
+
+                lastTapTime = 0;
+
+                return;
+
+            }
+
+
+            /*
+               İlk click yine
+               Play/Pause yapacak.
+            */
+
+            if (!countdownRunning) {
+
+                togglePlayPause();
+
+            }
+
+
+            lastTapTime =
+                now;
+
 
             return;
 
@@ -1209,12 +1420,23 @@ document.addEventListener(
 
 
         /*
-           BLE-M3 CLICK:
+           NORMAL MOD
 
-           PLAY / PAUSE
+           BLE-M3 CLICK
+           veya ekrana dokunma
+
+           = PLAY / PAUSE
         */
 
-        togglePlayPause();
+        if (!countdownRunning) {
+
+            togglePlayPause();
+
+        }
+
+
+        lastTapTime =
+            now;
 
     },
     true
@@ -1222,62 +1444,463 @@ document.addEventListener(
 
 
 /* =====================================================
-   SAYFA SCROLL
+   SLIDERLAR
 ===================================================== */
 
-/*
-   Kullanıcı veya BLE-M3 sayfayı
-   manuel olarak yukarı/aşağı kaydırdığında
-   teleprompterın otomatik oynatma durumuna
-   dokunmuyoruz.
-
-   Yani:
-
-   BLE-M3 yukarı
-   → yazı ileri
-
-   BLE-M3 aşağı
-   → yazı geri
-
-   CLICK
-   → pause/play
-*/
-
-
-window.addEventListener(
-    "scroll",
+speedSlider.addEventListener(
+    "input",
     function() {
 
-        /*
-           Manuel scroll yapıldığında
-           otomatik oynatmayı durdurmuyoruz.
+        speedValue.innerText =
+            speedSlider.value;
 
-           Böylece kumanda ile ileri/geri
-           yaparken sistem çalışmaya devam eder.
-        */
 
-    },
-    {
-        passive: true
+        localStorage.setItem(
+            "prompterSpeed",
+            speedSlider.value
+        );
+
+    }
+);
+
+
+fontSizeSlider.addEventListener(
+    "input",
+    function() {
+
+        textElement.style.fontSize =
+            fontSizeSlider.value +
+            "px";
+
+
+        fontSizeValue.innerText =
+            fontSizeSlider.value;
+
+
+        localStorage.setItem(
+            "prompterFont",
+            fontSizeSlider.value
+        );
+
+    }
+);
+
+
+textWidthSlider.addEventListener(
+    "input",
+    function() {
+
+        const width =
+            textWidthSlider.value;
+
+
+        textElement.style.width =
+            width + "%";
+
+
+        textWidthValue.innerText =
+            width + "%";
+
+
+        localStorage.setItem(
+            "prompterWidth",
+            width
+        );
+
     }
 );
 
 
 /* =====================================================
-   ESCAPE
+   METNİ OTOMATİK KAYDET
+===================================================== */
+
+inputText.addEventListener(
+    "input",
+    function() {
+
+        loadText();
+
+
+        localStorage.setItem(
+            "prompterText",
+            inputText.value
+        );
+
+    }
+);
+
+
+/* =====================================================
+   SESLİ KONTROL
+===================================================== */
+
+function setupVoiceRecognition() {
+
+
+    const SpeechRecognition =
+        window.SpeechRecognition ||
+        window.webkitSpeechRecognition;
+
+
+    /*
+       Tarayıcı desteklemiyorsa
+       teleprompter yine çalışacak.
+    */
+
+    if (!SpeechRecognition) {
+
+        voiceButton.innerText =
+            "🎙 Ses Desteklenmiyor";
+
+
+        voiceButton.disabled =
+            true;
+
+
+        return;
+
+    }
+
+
+    recognition =
+        new SpeechRecognition();
+
+
+    recognition.lang =
+        "tr-TR";
+
+
+    recognition.continuous =
+        true;
+
+
+    recognition.interimResults =
+        false;
+
+
+    recognition.onstart =
+        function() {
+
+            voiceIndicator.classList.add(
+                "listening"
+            );
+
+        };
+
+
+    recognition.onend =
+        function() {
+
+            voiceIndicator.classList.remove(
+                "listening"
+            );
+
+
+            /*
+               Ses kontrolü açıksa
+               yeniden başlatmayı dene.
+            */
+
+            if (voiceEnabled) {
+
+                setTimeout(
+                    function() {
+
+                        try {
+
+                            recognition.start();
+
+                        } catch(e) {}
+
+                    },
+                    500
+                );
+
+            }
+
+        };
+
+
+    recognition.onerror =
+        function(event) {
+
+            console.log(
+                "Ses tanıma:",
+                event.error
+            );
+
+        };
+
+
+    recognition.onresult =
+        function(event) {
+
+
+            const last =
+                event.results.length -
+                1;
+
+
+            const command =
+                event.results[last][0]
+                .transcript
+                .toLowerCase()
+                .trim();
+
+
+            console.log(
+                "Sesli komut:",
+                command
+            );
+
+
+            handleVoiceCommand(
+                command
+            );
+
+        };
+
+}
+
+
+/* =====================================================
+   SES AÇ / KAPAT
+===================================================== */
+
+function toggleVoiceControl() {
+
+
+    if (!recognition)
+        return;
+
+
+    voiceEnabled =
+        !voiceEnabled;
+
+
+    if (voiceEnabled) {
+
+
+        voiceButton.classList.add(
+            "activeButton"
+        );
+
+
+        voiceButton.innerText =
+            "🎙 Ses Açık";
+
+
+        try {
+
+            recognition.start();
+
+        } catch(e) {}
+
+
+    } else {
+
+
+        voiceButton.classList.remove(
+            "activeButton"
+        );
+
+
+        voiceButton.innerText =
+            "🎙 Sesli Kontrol";
+
+
+        try {
+
+            recognition.stop();
+
+        } catch(e) {}
+
+    }
+
+}
+
+
+/* =====================================================
+   SES KOMUTLARI
+===================================================== */
+
+function handleVoiceCommand(
+command
+) {
+
+
+    /*
+       BAŞLAT
+    */
+
+    if (
+        command.includes(
+            "başlat"
+        )
+    ) {
+
+        startCountdown();
+
+        return;
+
+    }
+
+
+    /*
+       DUR
+    */
+
+    if (
+        command.includes(
+            "dur"
+        ) ||
+        command.includes(
+            "duraklat"
+        )
+    ) {
+
+        stopScrolling();
+
+        return;
+
+    }
+
+
+    /*
+       DEVAM
+    */
+
+    if (
+        command.includes(
+            "devam"
+        )
+    ) {
+
+        startScrolling();
+
+        return;
+
+    }
+
+
+    /*
+       İLERİ
+    */
+
+    if (
+        command.includes(
+            "ileri"
+        )
+    ) {
+
+        moveForward();
+
+        return;
+
+    }
+
+
+    /*
+       GERİ
+    */
+
+    if (
+        command.includes(
+            "geri"
+        )
+    ) {
+
+        moveBackward();
+
+        return;
+
+    }
+
+
+    /*
+       BAŞA DÖN
+    */
+
+    if (
+        command.includes(
+            "başa"
+        )
+    ) {
+
+        restartText();
+
+        return;
+
+    }
+
+
+    /*
+       AYNA
+    */
+
+    if (
+        command.includes(
+            "ayna"
+        ) ||
+        command.includes(
+            "mirror"
+        )
+    ) {
+
+        toggleMirror();
+
+        return;
+
+    }
+
+
+    /*
+       ÇEKİM MODU
+    */
+
+    if (
+        command.includes(
+            "çekim"
+        )
+    ) {
+
+        enterPresentationMode();
+
+        return;
+
+    }
+
+}
+
+
+/* =====================================================
+   KLAVYE YEDEK KONTROL
 ===================================================== */
 
 document.addEventListener(
     "keydown",
     function(event) {
 
+
         if (
             event.key === "Escape"
         ) {
 
-            document.body.classList.remove(
-                "presentation-mode"
-            );
+            exitPresentationMode();
+
+        }
+
+
+        if (
+            event.code === "Space" &&
+            document.activeElement !==
+            inputText
+        ) {
+
+            event.preventDefault();
+
+            togglePlayPause();
 
         }
 
@@ -1286,10 +1909,12 @@ document.addEventListener(
 
 
 /* =====================================================
-   SAYFA İLK AÇILIŞ
+   BAŞLANGIÇ
 ===================================================== */
 
-loadText();
+loadSettings();
+
+setupVoiceRecognition();
 
 
 setStatus(
@@ -1298,20 +1923,8 @@ setStatus(
 );
 
 
-/* =====================================================
-   KONSOL KONTROLÜ
-===================================================== */
-
 console.log(
     "Teleprompter Pro hazır."
-);
-
-console.log(
-    "BLE-M3: Yukarı/Aşağı = Scroll"
-);
-
-console.log(
-    "BLE-M3: Click = Play/Pause"
 );
 
 </script>
