@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
+
 <meta charset="UTF-8">
 
 <meta name="viewport"
-      content="width=device-width,
-               initial-scale=1.0,
-               maximum-scale=1.0,
-               user-scalable=no">
+content="width=device-width,
+maximum-scale=1.0,
+user-scalable=no">
 
-<title>BLE-M3 Test</title>
+<title>BLE-M3 Test 2</title>
 
 <style>
 
@@ -17,400 +17,497 @@
     box-sizing: border-box;
 }
 
+html,
 body {
     margin: 0;
+    width: 100%;
+    height: 100%;
     background: #080808;
     color: white;
     font-family: Arial, sans-serif;
-    min-height: 100vh;
-    padding: 25px;
+}
+
+body {
+    padding: 20px;
+    overflow: hidden;
 }
 
 h1 {
     text-align: center;
-    font-size: 28px;
-    margin-bottom: 10px;
+    margin: 10px 0;
 }
 
 .info {
     text-align: center;
     color: #aaa;
     line-height: 1.5;
-    margin-bottom: 25px;
-}
-
-#status {
-    text-align: center;
-    padding: 15px;
-    background: #151515;
-    border-radius: 12px;
     margin-bottom: 20px;
 }
 
-#lastEvent {
-    background: #202020;
+#last {
+    background: #181818;
     border-radius: 15px;
     padding: 25px;
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
-#eventName {
-    font-size: 38px;
+#event {
+    font-size: 30px;
     font-weight: bold;
     margin-top: 10px;
-    color: #fff;
 }
 
-#eventCode {
-    margin-top: 10px;
+#details {
     color: #aaa;
-    font-size: 16px;
+    margin-top: 10px;
+}
+
+#movement {
+    background: #111;
+    border: 2px solid #333;
+    border-radius: 15px;
+    padding: 25px;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+#direction {
+    font-size: 40px;
+    font-weight: bold;
+}
+
+#values {
+    color: #aaa;
+    margin-top: 10px;
 }
 
 #log {
+    height: 35vh;
+    overflow-y: auto;
     background: #050505;
     border: 1px solid #333;
     border-radius: 12px;
-    padding: 15px;
-    min-height: 250px;
+    padding: 10px;
     font-family: monospace;
-    font-size: 15px;
-    overflow-y: auto;
+    font-size: 14px;
 }
 
-.log-item {
-    padding: 8px 0;
+.log {
+    padding: 7px 0;
     border-bottom: 1px solid #222;
 }
 
 button {
     width: 100%;
-    padding: 15px;
-    border: none;
+    padding: 14px;
+    margin-top: 12px;
+    border: 0;
     border-radius: 10px;
     background: #333;
     color: white;
     font-size: 17px;
-    margin-top: 15px;
-}
-
-button:active {
-    transform: scale(.98);
 }
 
 </style>
+
 </head>
 
 <body>
 
-<h1>BLE-M3 Test</h1>
+<h1>BLE-M3 TEST 2</h1>
 
 <div class="info">
-    Kumandanı Bluetooth ile iPad'e bağla.<br>
-    AssistiveTouch açık olsun.<br><br>
 
-    Şimdi kumandadaki tuşlara <strong>tek tek</strong> bas.
-</div>
+Bluetooth + AssistiveTouch açık olsun.<br><br>
 
-<div id="status">
-    Safari klavye/giriş olaylarını bekliyor...
-</div>
+Şimdi kumandayı kullanarak:<br>
 
-<div id="lastEvent">
-
-    Son algılanan olay:
-
-    <div id="eventName">
-        Henüz yok
-    </div>
-
-    <div id="eventCode">
-        —
-    </div>
+<strong>
+1. Yukarı hareket ettir<br>
+2. Aşağı hareket ettir<br>
+3. Ekrana bas
+</strong>
 
 </div>
+
+
+<div id="last">
+
+Son olay:
+
+<div id="event">
+Henüz yok
+</div>
+
+<div id="details">
+—
+</div>
+
+</div>
+
+
+<div id="movement">
+
+Hareket:
+
+<div id="direction">
+BEKLENİYOR
+</div>
+
+<div id="values">
+X: 0 | Y: 0
+</div>
+
+</div>
+
 
 <div id="log"></div>
 
+
 <button onclick="clearLog()">
-    TESTİ TEMİZLE
+TESTİ TEMİZLE
 </button>
+
 
 <script>
 
-/* =====================================================
-   BLE-M3 / SAFARI EVENT TESTER
-===================================================== */
+/* =========================================
+   ELEMANLAR
+========================================= */
 
-const eventName =
-    document.getElementById("eventName");
+const eventBox =
+document.getElementById("event");
 
-const eventCode =
-    document.getElementById("eventCode");
+const detailsBox =
+document.getElementById("details");
 
-const log =
-    document.getElementById("log");
+const directionBox =
+document.getElementById("direction");
 
-const status =
-    document.getElementById("status");
+const valuesBox =
+document.getElementById("values");
 
-
-/* =====================================================
-   KLAVYE OLAYI
-===================================================== */
-
-document.addEventListener(
-    "keydown",
-    function(event) {
-
-        event.preventDefault();
-
-        showEvent(
-            "KEYDOWN",
-            event
-        );
-
-    },
-    true
-);
+const logBox =
+document.getElementById("log");
 
 
-document.addEventListener(
-    "keyup",
-    function(event) {
-
-        event.preventDefault();
-
-        showEvent(
-            "KEYUP",
-            event
-        );
-
-    },
-    true
-);
-
-
-/* =====================================================
-   CLICK
-===================================================== */
-
-document.addEventListener(
-    "click",
-    function(event) {
-
-        showPointerEvent(
-            "CLICK",
-            event
-        );
-
-    },
-    true
-);
-
-
-/* =====================================================
+/* =========================================
    POINTER DOWN
-===================================================== */
+========================================= */
 
 document.addEventListener(
-    "pointerdown",
-    function(event) {
+"pointerdown",
+function(e) {
 
-        showPointerEvent(
-            "POINTER DOWN",
-            event
-        );
+    show(
+        "POINTER DOWN",
+        "pointerType: " +
+        e.pointerType +
+        " | button: " +
+        e.button
+    );
 
-    },
-    true
+},
+true
 );
 
 
-/* =====================================================
+/* =========================================
    POINTER UP
-===================================================== */
+========================================= */
 
 document.addEventListener(
-    "pointerup",
-    function(event) {
+"pointerup",
+function(e) {
 
-        showPointerEvent(
-            "POINTER UP",
-            event
-        );
+    show(
+        "POINTER UP",
+        "pointerType: " +
+        e.pointerType +
+        " | button: " +
+        e.button
+    );
 
-    },
-    true
+},
+true
 );
 
 
-/* =====================================================
+/* =========================================
+   CLICK
+========================================= */
+
+document.addEventListener(
+"click",
+function(e) {
+
+    show(
+        "CLICK",
+        "pointerType: " +
+        e.pointerType +
+        " | button: " +
+        e.button
+    );
+
+},
+true
+);
+
+
+/* =========================================
+   POINTER MOVE
+========================================= */
+
+let lastX = null;
+let lastY = null;
+
+document.addEventListener(
+"pointermove",
+function(e) {
+
+    let x =
+        e.clientX;
+
+    let y =
+        e.clientY;
+
+
+    if (
+        lastX === null ||
+        lastY === null
+    ) {
+
+        lastX = x;
+        lastY = y;
+
+        return;
+
+    }
+
+
+    let dx =
+        x - lastX;
+
+    let dy =
+        y - lastY;
+
+
+    /*
+       Çok küçük hareketleri
+       filtreliyoruz.
+    */
+
+    if (
+        Math.abs(dx) < 1 &&
+        Math.abs(dy) < 1
+    ) {
+
+        return;
+
+    }
+
+
+    let direction =
+        "HAREKET";
+
+
+    if (
+        Math.abs(dy) >
+        Math.abs(dx)
+    ) {
+
+        if (dy < 0) {
+
+            direction =
+                "⬆️ YUKARI";
+
+        } else {
+
+            direction =
+                "⬇️ AŞAĞI";
+
+        }
+
+    } else {
+
+        if (dx > 0) {
+
+            direction =
+                "➡️ SAĞ";
+
+        } else {
+
+            direction =
+                "⬅️ SOL";
+
+        }
+
+    }
+
+
+    directionBox.innerText =
+        direction;
+
+
+    valuesBox.innerText =
+        "X: " +
+        dx.toFixed(1) +
+        " | Y: " +
+        dy.toFixed(1);
+
+
+    addLog(
+        "POINTER MOVE → " +
+        direction +
+        " | dx=" +
+        dx.toFixed(1) +
+        " | dy=" +
+        dy.toFixed(1) +
+        " | pointer=" +
+        e.pointerType
+    );
+
+
+    lastX = x;
+    lastY = y;
+
+},
+true
+);
+
+
+/* =========================================
+   WHEEL
+========================================= */
+
+document.addEventListener(
+"wheel",
+function(e) {
+
+    show(
+        "WHEEL",
+        "deltaX: " +
+        e.deltaX +
+        " | deltaY: " +
+        e.deltaY
+    );
+
+    addLog(
+        "WHEEL → deltaY=" +
+        e.deltaY
+    );
+
+},
+true
+);
+
+
+/* =========================================
    TOUCH
-===================================================== */
+========================================= */
 
 document.addEventListener(
-    "touchstart",
-    function(event) {
+"touchstart",
+function() {
 
-        showSimpleEvent(
-            "TOUCH START"
-        );
+    show(
+        "TOUCH START",
+        "Safari touch olayı"
+    );
 
-    },
-    true
+},
+true
 );
 
 
 document.addEventListener(
-    "touchend",
-    function(event) {
+"touchend",
+function() {
 
-        showSimpleEvent(
-            "TOUCH END"
-        );
+    show(
+        "TOUCH END",
+        "Safari touch olayı"
+    );
 
-    },
-    true
+},
+true
 );
 
 
-/* =====================================================
-   KLAVYE EVENT GÖSTER
-===================================================== */
+/* =========================================
+   GÖSTER
+========================================= */
 
-function showEvent(type, event) {
+function show(
+    name,
+    details
+) {
 
-    const name =
-        event.key || "Bilinmiyor";
-
-    const code =
-        event.code || "Bilinmiyor";
-
-    const keyCode =
-        event.keyCode || "—";
-
-    eventName.innerText =
+    eventBox.innerText =
         name;
 
-    eventCode.innerText =
-        "code: " +
-        code +
-        " | keyCode: " +
-        keyCode +
-        " | type: " +
-        type;
-
-    status.innerText =
-        "Klavye olayı algılandı";
+    detailsBox.innerText =
+        details;
 
     addLog(
-        type +
-        " → key: [" +
         name +
-        "] | code: [" +
-        code +
-        "] | keyCode: [" +
-        keyCode +
-        "]"
+        " → " +
+        details
     );
 
 }
 
 
-/* =====================================================
-   POINTER EVENT
-===================================================== */
-
-function showPointerEvent(type, event) {
-
-    eventName.innerText =
-        type;
-
-    eventCode.innerText =
-        "pointerType: " +
-        (event.pointerType || "—") +
-        " | button: " +
-        (event.button ?? "—");
-
-    status.innerText =
-        "Pointer olayı algılandı";
-
-    addLog(
-        type +
-        " → pointerType: [" +
-        (event.pointerType || "—") +
-        "] | button: [" +
-        (event.button ?? "—") +
-        "]"
-    );
-
-}
-
-
-/* =====================================================
-   BASİT EVENT
-===================================================== */
-
-function showSimpleEvent(type) {
-
-    eventName.innerText =
-        type;
-
-    eventCode.innerText =
-        "Safari bu olayı algıladı.";
-
-    status.innerText =
-        "Dokunmatik olay algılandı";
-
-    addLog(type);
-
-}
-
-
-/* =====================================================
+/* =========================================
    LOG
-===================================================== */
+========================================= */
 
 function addLog(message) {
 
-    const item =
+    const div =
         document.createElement("div");
 
-    item.className =
-        "log-item";
+    div.className =
+        "log";
 
     const time =
-        new Date().toLocaleTimeString();
+        new Date()
+        .toLocaleTimeString();
 
-    item.innerText =
+    div.innerText =
         "[" +
         time +
         "] " +
         message;
 
-    log.prepend(item);
+    logBox.prepend(div);
 
 }
 
 
-/* =====================================================
+/* =========================================
    TEMİZLE
-===================================================== */
+========================================= */
 
 function clearLog() {
 
-    log.innerHTML = "";
+    logBox.innerHTML = "";
 
-    eventName.innerText =
+    eventBox.innerText =
         "Henüz yok";
 
-    eventCode.innerText =
+    detailsBox.innerText =
         "—";
 
-    status.innerText =
-        "Test temizlendi";
+    directionBox.innerText =
+        "BEKLENİYOR";
+
+    valuesBox.innerText =
+        "X: 0 | Y: 0";
+
+    lastX = null;
+    lastY = null;
 
 }
 
