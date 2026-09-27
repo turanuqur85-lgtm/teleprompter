@@ -2,169 +2,418 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>Teleprompter Pro</title>
+
+<meta name="viewport"
+      content="width=device-width,
+               initial-scale=1.0,
+               maximum-scale=1.0,
+               user-scalable=no">
+
+<title>BLE-M3 Test</title>
 
 <style>
+
+* {
+    box-sizing: border-box;
+}
+
 body {
     margin: 0;
-    background: black;
+    background: #080808;
     color: white;
-    font-size: 60px;
-    overflow: hidden;
-    font-family: Arial;
+    font-family: Arial, sans-serif;
+    min-height: 100vh;
+    padding: 25px;
 }
 
-#text {
-    position: absolute;
-    width: 100%;
+h1 {
     text-align: center;
-    white-space: pre-line;
-    bottom: 0;
+    font-size: 28px;
+    margin-bottom: 10px;
 }
 
-.controls {
-    position: fixed;
-    top: 10px;
-    left: 10px;
-    z-index: 10;
-    background: rgba(0,0,0,0.6);
-    padding: 10px;
+.info {
+    text-align: center;
+    color: #aaa;
+    line-height: 1.5;
+    margin-bottom: 25px;
 }
 
-#countdown {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 120px;
-    display: none;
+#status {
+    text-align: center;
+    padding: 15px;
+    background: #151515;
+    border-radius: 12px;
+    margin-bottom: 20px;
 }
+
+#lastEvent {
+    background: #202020;
+    border-radius: 15px;
+    padding: 25px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+#eventName {
+    font-size: 38px;
+    font-weight: bold;
+    margin-top: 10px;
+    color: #fff;
+}
+
+#eventCode {
+    margin-top: 10px;
+    color: #aaa;
+    font-size: 16px;
+}
+
+#log {
+    background: #050505;
+    border: 1px solid #333;
+    border-radius: 12px;
+    padding: 15px;
+    min-height: 250px;
+    font-family: monospace;
+    font-size: 15px;
+    overflow-y: auto;
+}
+
+.log-item {
+    padding: 8px 0;
+    border-bottom: 1px solid #222;
+}
+
+button {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    background: #333;
+    color: white;
+    font-size: 17px;
+    margin-top: 15px;
+}
+
+button:active {
+    transform: scale(.98);
+}
+
 </style>
 </head>
 
 <body>
 
-<div class="controls">
-    <textarea id="inputText" rows="4" cols="40" placeholder="Metni buraya yapıştır"></textarea><br>
-    <button onclick="startCountdown()">Başlat</button>
-    <button onclick="pause()">Duraklat</button>
-    <button onclick="mirror()">Mirror</button>
-    <button onclick="forward()">İleri</button>
-    <button onclick="backward()">Geri</button>
-    Hız: <input type="range" id="speed" min="1" max="10" value="3">
+<h1>BLE-M3 Test</h1>
+
+<div class="info">
+    Kumandanı Bluetooth ile iPad'e bağla.<br>
+    AssistiveTouch açık olsun.<br><br>
+
+    Şimdi kumandadaki tuşlara <strong>tek tek</strong> bas.
 </div>
 
-<div id="countdown">3</div>
-<div id="text"></div>
+<div id="status">
+    Safari klavye/giriş olaylarını bekliyor...
+</div>
+
+<div id="lastEvent">
+
+    Son algılanan olay:
+
+    <div id="eventName">
+        Henüz yok
+    </div>
+
+    <div id="eventCode">
+        —
+    </div>
+
+</div>
+
+<div id="log"></div>
+
+<button onclick="clearLog()">
+    TESTİ TEMİZLE
+</button>
 
 <script>
-let pos = 0;
-let interval;
-let isPlaying = false;
 
-// GERİ SAYIM
-function startCountdown() {
-    let count = 3;
-    const cd = document.getElementById("countdown");
-    cd.style.display = "block";
-    cd.innerText = count;
+/* =====================================================
+   BLE-M3 / SAFARI EVENT TESTER
+===================================================== */
 
-    let countdownInterval = setInterval(() => {
-        count--;
-        if (count === 0) {
-            cd.innerText = "0";
-        } else {
-            cd.innerText = count;
-        }
+const eventName =
+    document.getElementById("eventName");
 
-        if (count < 0) {
-            clearInterval(countdownInterval);
-            cd.style.display = "none";
-            start();
-        }
-    }, 1000);
+const eventCode =
+    document.getElementById("eventCode");
+
+const log =
+    document.getElementById("log");
+
+const status =
+    document.getElementById("status");
+
+
+/* =====================================================
+   KLAVYE OLAYI
+===================================================== */
+
+document.addEventListener(
+    "keydown",
+    function(event) {
+
+        event.preventDefault();
+
+        showEvent(
+            "KEYDOWN",
+            event
+        );
+
+    },
+    true
+);
+
+
+document.addEventListener(
+    "keyup",
+    function(event) {
+
+        event.preventDefault();
+
+        showEvent(
+            "KEYUP",
+            event
+        );
+
+    },
+    true
+);
+
+
+/* =====================================================
+   CLICK
+===================================================== */
+
+document.addEventListener(
+    "click",
+    function(event) {
+
+        showPointerEvent(
+            "CLICK",
+            event
+        );
+
+    },
+    true
+);
+
+
+/* =====================================================
+   POINTER DOWN
+===================================================== */
+
+document.addEventListener(
+    "pointerdown",
+    function(event) {
+
+        showPointerEvent(
+            "POINTER DOWN",
+            event
+        );
+
+    },
+    true
+);
+
+
+/* =====================================================
+   POINTER UP
+===================================================== */
+
+document.addEventListener(
+    "pointerup",
+    function(event) {
+
+        showPointerEvent(
+            "POINTER UP",
+            event
+        );
+
+    },
+    true
+);
+
+
+/* =====================================================
+   TOUCH
+===================================================== */
+
+document.addEventListener(
+    "touchstart",
+    function(event) {
+
+        showSimpleEvent(
+            "TOUCH START"
+        );
+
+    },
+    true
+);
+
+
+document.addEventListener(
+    "touchend",
+    function(event) {
+
+        showSimpleEvent(
+            "TOUCH END"
+        );
+
+    },
+    true
+);
+
+
+/* =====================================================
+   KLAVYE EVENT GÖSTER
+===================================================== */
+
+function showEvent(type, event) {
+
+    const name =
+        event.key || "Bilinmiyor";
+
+    const code =
+        event.code || "Bilinmiyor";
+
+    const keyCode =
+        event.keyCode || "—";
+
+    eventName.innerText =
+        name;
+
+    eventCode.innerText =
+        "code: " +
+        code +
+        " | keyCode: " +
+        keyCode +
+        " | type: " +
+        type;
+
+    status.innerText =
+        "Klavye olayı algılandı";
+
+    addLog(
+        type +
+        " → key: [" +
+        name +
+        "] | code: [" +
+        code +
+        "] | keyCode: [" +
+        keyCode +
+        "]"
+    );
+
 }
 
-// BAŞLAT
-function start() {
-    const textEl = document.getElementById("text");
-    textEl.innerText = document.getElementById("inputText").value;
 
-    pos = -window.innerHeight;
-    textEl.style.bottom = pos + "px";
+/* =====================================================
+   POINTER EVENT
+===================================================== */
 
-    if (isPlaying) return;
+function showPointerEvent(type, event) {
 
-    isPlaying = true;
-    interval = setInterval(scrollText, 30);
+    eventName.innerText =
+        type;
+
+    eventCode.innerText =
+        "pointerType: " +
+        (event.pointerType || "—") +
+        " | button: " +
+        (event.button ?? "—");
+
+    status.innerText =
+        "Pointer olayı algılandı";
+
+    addLog(
+        type +
+        " → pointerType: [" +
+        (event.pointerType || "—") +
+        "] | button: [" +
+        (event.button ?? "—") +
+        "]"
+    );
+
 }
 
-// DURDUR
-function pause() {
-    isPlaying = false;
-    clearInterval(interval);
+
+/* =====================================================
+   BASİT EVENT
+===================================================== */
+
+function showSimpleEvent(type) {
+
+    eventName.innerText =
+        type;
+
+    eventCode.innerText =
+        "Safari bu olayı algıladı.";
+
+    status.innerText =
+        "Dokunmatik olay algılandı";
+
+    addLog(type);
+
 }
 
-// SCROLL
-function scrollText() {
-    let speed = document.getElementById("speed").value;
-    pos += Number(speed);
-    document.getElementById("text").style.bottom = pos + "px";
+
+/* =====================================================
+   LOG
+===================================================== */
+
+function addLog(message) {
+
+    const item =
+        document.createElement("div");
+
+    item.className =
+        "log-item";
+
+    const time =
+        new Date().toLocaleTimeString();
+
+    item.innerText =
+        "[" +
+        time +
+        "] " +
+        message;
+
+    log.prepend(item);
+
 }
 
-// İLERİ SAR
-function forward() {
-    pos += 200;
-    document.getElementById("text").style.bottom = pos + "px";
+
+/* =====================================================
+   TEMİZLE
+===================================================== */
+
+function clearLog() {
+
+    log.innerHTML = "";
+
+    eventName.innerText =
+        "Henüz yok";
+
+    eventCode.innerText =
+        "—";
+
+    status.innerText =
+        "Test temizlendi";
+
 }
 
-// GERİ SAR
-function backward() {
-    pos -= 200;
-    document.getElementById("text").style.bottom = pos + "px";
-}
-
-// MIRROR
-function mirror() {
-    let el = document.getElementById("text");
-
-    if (el.style.transform === "scaleX(-1)") {
-        el.style.transform = "scaleX(1)";
-    } else {
-        el.style.transform = "scaleX(-1)";
-    }
-}
-
-// KLAVYE / KUMANDA
-document.addEventListener("keydown", function(e) {
-
-    if (e.key === " ") {
-        if (isPlaying) pause();
-        else startCountdown();
-    }
-
-    if (e.key === "ArrowUp") {
-        let s = document.getElementById("speed");
-        s.value = Number(s.value) + 1;
-    }
-
-    if (e.key === "ArrowDown") {
-        let s = document.getElementById("speed");
-        s.value = Number(s.value) - 1;
-    }
-
-    if (e.key === "ArrowRight") {
-        forward();
-    }
-
-    if (e.key === "ArrowLeft") {
-        backward();
-    }
-
-    if (e.key === "m") {
-        mirror();
-    }
-});
 </script>
 
 </body>
