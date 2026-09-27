@@ -931,10 +931,19 @@ let lastTapTime = 0;
 
 
 /*
-   Manuel ileri / geri
+   Manuel ileri / geri miktarı
 */
 
 const jumpAmount = 400;
+
+
+/*
+   HIZ SINIRLARI
+*/
+
+const MIN_SPEED = 0.25;
+
+const MAX_SPEED = 8;
 
 
 /* =====================================================
@@ -1102,7 +1111,9 @@ function restartText() {
 
 function startCountdown() {
 
-    if (countdownRunning)
+    if (
+        countdownRunning
+    )
         return;
 
 
@@ -1185,7 +1196,9 @@ function startCountdown() {
 
 function startScrolling() {
 
-    if (isPlaying)
+    if (
+        isPlaying
+    )
         return;
 
 
@@ -1255,7 +1268,9 @@ function togglePlayPause() {
         return;
 
 
-    if (isPlaying) {
+    if (
+        isPlaying
+    ) {
 
         stopScrolling();
 
@@ -1272,9 +1287,13 @@ function togglePlayPause() {
    SCROLL MOTORU
 ===================================================== */
 
-function scrollLoop(timestamp) {
+function scrollLoop(
+    timestamp
+) {
 
-    if (!isPlaying)
+    if (
+        !isPlaying
+    )
         return;
 
 
@@ -1378,6 +1397,134 @@ function moveBackward() {
 
 
 /* =====================================================
+   HIZI DEĞİŞTİR
+===================================================== */
+
+function changeSpeed(
+    amount
+) {
+
+    let current =
+        Number(
+            speedSlider.value
+        );
+
+
+    let newSpeed =
+        current + amount;
+
+
+    /*
+       Alt / üst sınır
+    */
+
+    newSpeed =
+        Math.max(
+            MIN_SPEED,
+            Math.min(
+                MAX_SPEED,
+                newSpeed
+            )
+        );
+
+
+    /*
+       0.25 aralıklarına sabitle
+    */
+
+    newSpeed =
+        Math.round(
+            newSpeed * 4
+        ) / 4;
+
+
+    speedSlider.value =
+        newSpeed;
+
+
+    speedValue.innerText =
+        newSpeed;
+
+
+    localStorage.setItem(
+        "prompterSpeed",
+        newSpeed
+    );
+
+
+    /*
+       Kullanıcıya kısa bilgi
+    */
+
+    setStatus(
+        "Hız: " + newSpeed,
+        isPlaying
+        ? "playing"
+        : "paused"
+    );
+
+}
+
+
+/* =====================================================
+   HIZI DOĞRUDAN AYARLA
+===================================================== */
+
+function setSpeed(
+    value
+) {
+
+    let newSpeed =
+        Number(value);
+
+
+    if (
+        isNaN(newSpeed)
+    )
+        return;
+
+
+    newSpeed =
+        Math.max(
+            MIN_SPEED,
+            Math.min(
+                MAX_SPEED,
+                newSpeed
+            )
+        );
+
+
+    newSpeed =
+        Math.round(
+            newSpeed * 4
+        ) / 4;
+
+
+    speedSlider.value =
+        newSpeed;
+
+
+    speedValue.innerText =
+        newSpeed;
+
+
+    localStorage.setItem(
+        "prompterSpeed",
+        newSpeed
+    );
+
+
+    setStatus(
+        "Hız: " + newSpeed,
+        isPlaying
+        ? "playing"
+        : "paused"
+    );
+
+}
+
+
+/* =====================================================
    MIRROR
 ===================================================== */
 
@@ -1449,14 +1596,11 @@ function exitPresentationMode() {
         "none";
 
 
-    /*
-       Kullanıcıya çıktığını göster.
-    */
-
     setStatus(
         isPlaying
         ? "Oynatılıyor"
         : "Duraklatıldı",
+
         isPlaying
         ? "playing"
         : "paused"
@@ -1473,11 +1617,6 @@ document.addEventListener(
     "click",
     function(event) {
 
-
-        /*
-           Kontrol panelindeki normal
-           butonları engelleme.
-        */
 
         if (
             controls.contains(
@@ -1499,9 +1638,9 @@ document.addEventListener(
             lastTapTime;
 
 
-        /* =============================================
+        /*
            ÇEKİM MODU
-        ============================================= */
+        */
 
         if (
             document.body.classList.contains(
@@ -1532,7 +1671,7 @@ document.addEventListener(
 
             /*
                Tek dokunma
-               = PLAY / PAUSE
+               = play / pause
             */
 
             if (
@@ -1552,9 +1691,11 @@ document.addEventListener(
         }
 
 
-        /* =============================================
+        /*
            NORMAL MOD
-        ============================================= */
+
+           Click = Play / Pause
+        */
 
         if (
             !countdownRunning
@@ -1574,7 +1715,7 @@ document.addEventListener(
 
 
 /* =====================================================
-   HIZ
+   HIZ SLIDER
 ===================================================== */
 
 speedSlider.addEventListener(
@@ -1670,7 +1811,7 @@ inputText.addEventListener(
 
 
 /* =====================================================
-   SES TANIMA SİSTEMİ
+   SES TANIMA
 ===================================================== */
 
 function setupVoiceRecognition() {
@@ -1796,13 +1937,15 @@ function setupVoiceRecognition() {
 
 
 /* =====================================================
-   SESLİ KONTROLÜ AÇ / KAPAT
+   SESLİ KONTROL AÇ / KAPAT
 ===================================================== */
 
 function toggleVoiceControl() {
 
 
-    if (!recognition)
+    if (
+        !recognition
+    )
         return;
 
 
@@ -1855,7 +1998,7 @@ function toggleVoiceControl() {
 
 
 /* =====================================================
-   SESLİ KOMUT ANALİZİ
+   SESLİ KOMUT
 ===================================================== */
 
 function handleVoiceCommand(
@@ -1864,15 +2007,20 @@ function handleVoiceCommand(
 
 
     /*
-       Safari bazen noktalama işaretleri
-       veya fazladan boşluklar döndürebilir.
+       Noktalama işaretlerini temizle.
     */
 
     command =
         command
             .toLowerCase()
-            .replace(/[.,!?]/g, "")
-            .replace(/\s+/g, " ")
+            .replace(
+                /[.,!?]/g,
+                ""
+            )
+            .replace(
+                /\s+/g,
+                " "
+            )
             .trim();
 
 
@@ -1884,11 +2032,10 @@ function handleVoiceCommand(
 
     /* =================================================
        ÇEKİM MODUNDAN ÇIK
-       
-       BUNU EN BAŞA KOYUYORUZ.
     ================================================= */
 
     if (
+
         command.includes(
             "çekimden çık"
         ) ||
@@ -1908,6 +2055,7 @@ function handleVoiceCommand(
         command.includes(
             "ayarları göster"
         )
+
     ) {
 
         exitPresentationMode();
@@ -1922,11 +2070,13 @@ function handleVoiceCommand(
     ================================================= */
 
     if (
+
         command.includes(
             "çekim modu"
         ) ||
 
         command === "çekim"
+
     ) {
 
         enterPresentationMode();
@@ -1941,11 +2091,13 @@ function handleVoiceCommand(
     ================================================= */
 
     if (
+
         command.includes(
             "başlat"
         ) ||
 
         command === "başla"
+
     ) {
 
         startCountdown();
@@ -1956,15 +2108,17 @@ function handleVoiceCommand(
 
 
     /* =================================================
-       DURAKLAT
+       DUR
     ================================================= */
 
     if (
+
         command.includes(
             "duraklat"
         ) ||
 
         command === "dur"
+
     ) {
 
         stopScrolling();
@@ -1979,6 +2133,7 @@ function handleVoiceCommand(
     ================================================= */
 
     if (
+
         command.includes(
             "devam"
         ) ||
@@ -1990,6 +2145,7 @@ function handleVoiceCommand(
         command.includes(
             "devam et"
         )
+
     ) {
 
         startScrolling();
@@ -2004,6 +2160,7 @@ function handleVoiceCommand(
     ================================================= */
 
     if (
+
         command.includes(
             "başa dön"
         ) ||
@@ -2019,6 +2176,7 @@ function handleVoiceCommand(
         command.includes(
             "sıfırla"
         )
+
     ) {
 
         restartText();
@@ -2033,6 +2191,7 @@ function handleVoiceCommand(
     ================================================= */
 
     if (
+
         command.includes(
             "ayna"
         ) ||
@@ -2044,6 +2203,7 @@ function handleVoiceCommand(
         command.includes(
             "yansıt"
         )
+
     ) {
 
         toggleMirror();
@@ -2054,15 +2214,302 @@ function handleVoiceCommand(
 
 
     /* =================================================
-       İLERİ KOMUTLARI
+       HIZ KOMUTLARI
     ================================================= */
 
 
     /*
-       ÖNCE "ÇOK İLERİ"
+       MAKSİMUM HIZ
     */
 
     if (
+
+        command.includes(
+            "hızı maksimum"
+        ) ||
+
+        command.includes(
+            "hızı sonuna kadar"
+        ) ||
+
+        command.includes(
+            "maksimum hız"
+        )
+
+    ) {
+
+        setSpeed(
+            MAX_SPEED
+        );
+
+        return;
+
+    }
+
+
+    /*
+       MİNİMUM HIZ
+    */
+
+    if (
+
+        command.includes(
+            "hızı minimum"
+        ) ||
+
+        command.includes(
+            "minimum hız"
+        ) ||
+
+        command.includes(
+            "en yavaş"
+        )
+
+    ) {
+
+        setSpeed(
+            MIN_SPEED
+        );
+
+        return;
+
+    }
+
+
+    /*
+       DOĞRUDAN HIZ:
+
+       "Hızı 5 yap"
+       "Hızı 3 yap"
+       "Hızı 2.5 yap"
+    */
+
+    const speedMatch =
+        command.match(
+            /hızı\s+(\d+(?:[.,]\d+)?)\s*(?:yap|ayarla)?/
+        );
+
+
+    if (
+        speedMatch
+    ) {
+
+        const requestedSpeed =
+            parseFloat(
+                speedMatch[1]
+                    .replace(
+                        ",",
+                        "."
+                    )
+            );
+
+
+        setSpeed(
+            requestedSpeed
+        );
+
+        return;
+
+    }
+
+
+    /*
+       ÇOK HIZLANDIR
+    */
+
+    if (
+
+        command.includes(
+            "çok hızlandır"
+        ) ||
+
+        command.includes(
+            "çok hızlan"
+        ) ||
+
+        command.includes(
+            "hızı çok artır"
+        )
+
+    ) {
+
+        changeSpeed(
+            +1
+        );
+
+        return;
+
+    }
+
+
+    /*
+       BİRAZ HIZLANDIR
+    */
+
+    if (
+
+        command.includes(
+            "biraz hızlandır"
+        ) ||
+
+        command.includes(
+            "biraz hızlan"
+        ) ||
+
+        command.includes(
+            "hızı biraz artır"
+        )
+
+    ) {
+
+        changeSpeed(
+            +0.5
+        );
+
+        return;
+
+    }
+
+
+    /*
+       NORMAL HIZ ARTIR
+    */
+
+    if (
+
+        command.includes(
+            "hızı artır"
+        ) ||
+
+        command.includes(
+            "hız artır"
+        ) ||
+
+        command.includes(
+            "hızlandır"
+        ) ||
+
+        command.includes(
+            "hızlan"
+        ) ||
+
+        command.includes(
+            "daha hızlı"
+        )
+
+    ) {
+
+        changeSpeed(
+            +0.5
+        );
+
+        return;
+
+    }
+
+
+    /*
+       ÇOK YAVAŞLAT
+    */
+
+    if (
+
+        command.includes(
+            "çok yavaşlat"
+        ) ||
+
+        command.includes(
+            "çok yavaşla"
+        ) ||
+
+        command.includes(
+            "hızı çok azalt"
+        )
+
+    ) {
+
+        changeSpeed(
+            -1
+        );
+
+        return;
+
+    }
+
+
+    /*
+       BİRAZ YAVAŞLAT
+    */
+
+    if (
+
+        command.includes(
+            "biraz yavaşlat"
+        ) ||
+
+        command.includes(
+            "biraz yavaşla"
+        ) ||
+
+        command.includes(
+            "hızı biraz azalt"
+        )
+
+    ) {
+
+        changeSpeed(
+            -0.5
+        );
+
+        return;
+
+    }
+
+
+    /*
+       NORMAL YAVAŞLAT
+    */
+
+    if (
+
+        command.includes(
+            "hızı azalt"
+        ) ||
+
+        command.includes(
+            "yavaşlat"
+        ) ||
+
+        command.includes(
+            "yavaşla"
+        ) ||
+
+        command.includes(
+            "daha yavaş"
+        )
+
+    ) {
+
+        changeSpeed(
+            -0.5
+        );
+
+        return;
+
+    }
+
+
+    /* =================================================
+       İLERİ
+    ================================================= */
+
+
+    /*
+       ÇOK İLERİ
+    */
+
+    if (
+
         command.includes(
             "çok ileri"
         ) ||
@@ -2074,6 +2521,7 @@ function handleVoiceCommand(
         command.includes(
             "hızlı ileri"
         )
+
     ) {
 
         moveForwardAmount(
@@ -2086,10 +2534,11 @@ function handleVoiceCommand(
 
 
     /*
-       "BİRAZ İLERİ"
+       BİRAZ İLERİ
     */
 
     if (
+
         command.includes(
             "biraz ileri"
         ) ||
@@ -2097,6 +2546,7 @@ function handleVoiceCommand(
         command.includes(
             "az ileri"
         )
+
     ) {
 
         moveForwardAmount(
@@ -2109,12 +2559,7 @@ function handleVoiceCommand(
 
 
     /*
-       "X SANİYE İLERİ"
-
-       Örneğin:
-
-       5 saniye ileri
-       10 saniye ileri
+       X SANİYE İLERİ
     */
 
     const forwardSeconds =
@@ -2124,7 +2569,9 @@ function handleVoiceCommand(
 
 
     if (
+
         forwardSeconds !== null &&
+
         (
             command.includes(
                 "ileri"
@@ -2133,20 +2580,10 @@ function handleVoiceCommand(
             command.includes(
                 "ilerlet"
             )
+
         )
+
     ) {
-
-        /*
-           Mevcut otomatik hız:
-
-           speed px / frame
-
-           Yaklaşık 60 frame / saniye.
-
-           Bu yüzden:
-
-           saniye × hız × 60
-        */
 
         const speed =
             Number(
@@ -2171,16 +2608,10 @@ function handleVoiceCommand(
 
     /*
        NORMAL İLERİ
-
-       "ileri"
-       "ileri al"
-       "ilerlet"
-       "yazıyı ileri al"
-       "metni ileri al"
-       "ileriye al"
     */
 
     if (
+
         command.includes(
             "ileri"
         ) ||
@@ -2192,6 +2623,7 @@ function handleVoiceCommand(
         command.includes(
             "ileriye"
         )
+
     ) {
 
         moveForward();
@@ -2202,7 +2634,7 @@ function handleVoiceCommand(
 
 
     /* =================================================
-       GERİ KOMUTLARI
+       GERİ
     ================================================= */
 
 
@@ -2211,6 +2643,7 @@ function handleVoiceCommand(
     */
 
     if (
+
         command.includes(
             "çok geri"
         ) ||
@@ -2222,6 +2655,7 @@ function handleVoiceCommand(
         command.includes(
             "hızlı geri"
         )
+
     ) {
 
         moveBackwardAmount(
@@ -2238,6 +2672,7 @@ function handleVoiceCommand(
     */
 
     if (
+
         command.includes(
             "biraz geri"
         ) ||
@@ -2245,6 +2680,7 @@ function handleVoiceCommand(
         command.includes(
             "az geri"
         )
+
     ) {
 
         moveBackwardAmount(
@@ -2267,7 +2703,9 @@ function handleVoiceCommand(
 
 
     if (
+
         backwardSeconds !== null &&
+
         (
             command.includes(
                 "geri"
@@ -2276,7 +2714,9 @@ function handleVoiceCommand(
             command.includes(
                 "geriye"
             )
+
         )
+
     ) {
 
         const speed =
@@ -2305,6 +2745,7 @@ function handleVoiceCommand(
     */
 
     if (
+
         command.includes(
             "geri"
         ) ||
@@ -2312,6 +2753,7 @@ function handleVoiceCommand(
         command.includes(
             "geriye"
         )
+
     ) {
 
         moveBackward();
@@ -2322,7 +2764,7 @@ function handleVoiceCommand(
 
 
     /*
-       EŞLEŞME YOK
+       KOMUT EŞLEŞMEDİ
     */
 
     console.log(
@@ -2343,11 +2785,11 @@ function extractSeconds(
 
 
     /*
-       Rakam şeklinde:
+       Rakam:
 
-       "5 saniye ileri"
-
-       "10 saniye geri"
+       5 saniye
+       10 saniye
+       2.5 saniye
     */
 
     const numberMatch =
@@ -2362,27 +2804,39 @@ function extractSeconds(
 
         return parseFloat(
             numberMatch[1]
-                .replace(",", ".")
+                .replace(
+                    ",",
+                    "."
+                )
         );
 
     }
 
 
     /*
-       Türkçe sayı kelimeleri
+       Türkçe sayılar
     */
 
     const numbers = {
 
         "bir": 1,
+
         "iki": 2,
+
         "üç": 3,
+
         "dört": 4,
+
         "beş": 5,
+
         "altı": 6,
+
         "yedi": 7,
+
         "sekiz": 8,
+
         "dokuz": 9,
+
         "on": 10
 
     };
@@ -2393,9 +2847,11 @@ function extractSeconds(
     ) {
 
         if (
+
             command.includes(
                 word + " saniye"
             )
+
         ) {
 
             return numbers[word];
@@ -2421,8 +2877,6 @@ document.addEventListener(
 
         /*
            ESC
-
-           Çekim modundan çık
         */
 
         if (
@@ -2436,15 +2890,15 @@ document.addEventListener(
 
         /*
            SPACE
-
-           Play / Pause
         */
 
         if (
+
             event.code === "Space" &&
 
             document.activeElement !==
             inputText
+
         ) {
 
             event.preventDefault();
@@ -2485,6 +2939,10 @@ console.log(
 
 console.log(
     "Çift dokunma = Çekim modundan çık"
+);
+
+console.log(
+    "Sesli hız kontrolü aktif"
 );
 
 </script>
